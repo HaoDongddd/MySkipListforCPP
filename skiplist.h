@@ -2,7 +2,7 @@
  * @Author: Hao Dong
  * @Date: 2021-07-04 11:12:48
  * @LastEditors: Hao Dong
- * @LastEditTime: 2021-07-05 15:44:42
+ * @LastEditTime: 2021-07-05 16:47:32
  * @Description: 
  */
 #ifndef SKIPLIST_H
@@ -184,13 +184,14 @@ bool skiplist::remove(int value)
     update[head->cur_level] = head;
     while(true)
     {
-        while(value > tmp_node->forward_pointer[tmp_level]->cur_level && tmp_node->forward_pointer[tmp_level] != tail)
+        while(value > tmp_node->forward_pointer[tmp_level]->value && tmp_node->forward_pointer[tmp_level] != tail)
         {
             tmp_node = tmp_node->forward_pointer[tmp_level];
             update[tmp_node->cur_level] = tmp_node;
         }
-        if(value == tmp_node->forward_pointer[tmp_level]->value)
+        if(value == tmp_node->forward_pointer[tmp_level]->value && tmp_level == 1)
         {
+            tmp_node = tmp_node->forward_pointer[tmp_level];
             break;
         }
         if(tmp_level == 1)
@@ -215,6 +216,29 @@ bool skiplist::remove(int value)
     }
     delete tmp_node;
     return true;
+}
+
+
+bool skiplist::search(int value)
+{
+    node* tmp_node = head;
+    int tmp_level = head->cur_level;
+    while(true)
+    {
+        while(value > tmp_node->forward_pointer[tmp_level]->value && tmp_node->forward_pointer[tmp_level] != tail)
+        {
+            tmp_node = tmp_node->forward_pointer[tmp_level];
+        }
+        if(value == tmp_node->forward_pointer[tmp_level]->value && tmp_node->forward_pointer[tmp_level] != tail)
+        {
+            return true;
+        }
+        if(tmp_level == 1)
+        {
+            return false;
+        }
+        --tmp_level;
+    }
 }
 
 void skiplist::display()
