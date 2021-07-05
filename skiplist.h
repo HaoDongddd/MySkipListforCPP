@@ -2,7 +2,7 @@
  * @Author: Hao Dong
  * @Date: 2021-07-04 11:12:48
  * @LastEditors: Hao Dong
- * @LastEditTime: 2021-07-05 16:47:32
+ * @LastEditTime: 2021-07-05 18:36:19
  * @Description: 
  */
 #ifndef SKIPLIST_H
@@ -67,9 +67,10 @@ class skiplist
         bool insert(int);
         bool search(int);
         bool remove(int);
+        unsigned int get_random_level();
         void display();
     private:
-        unsigned int get_random_level();
+        
 };
 
 /**
@@ -121,13 +122,17 @@ bool skiplist::insert(int value)
     int tmp_level = tmp_node->cur_level;
     while(true)//找到待插入位置
     {
-        while(value > tmp_node->forward_pointer[tmp_level]->value && tmp_node->forward_pointer[tmp_level] != tail)
+        while(tmp_node->forward_pointer[tmp_level] != tail && value > tmp_node->forward_pointer[tmp_level]->value)
         {
             /*
                 更新update数组这里之前写错了，导致后面无法重建索引，现已修正
             */
             tmp_node = tmp_node->forward_pointer[tmp_level];
             update[tmp_node->cur_level] = tmp_node;
+        }
+        if(tmp_node->forward_pointer[tmp_level] != tail && value == tmp_node->forward_pointer[tmp_level]->value)
+        {
+            return false;
         }
         if(tmp_level == 1)
         {
@@ -137,17 +142,17 @@ bool skiplist::insert(int value)
     }
     //insert after tmp_node
     node* new_node = create_node(value);
-    cout << "new node level: " << new_node->cur_level << " " << new_node << "\n";
+    //cout << "new node level: " << new_node->cur_level << " " << new_node << "\n";
     if(new_node->cur_level > maxmum_level_of_the_list)
     {
         maxmum_level_of_the_list = new_node->cur_level;
     }
-    cout << "head:" << head << "\n";
-    cout << "tail:" << tail << "\n";
-    for(int i = 1;i <= max_level;++i)
-    {
-        cout << "update[" << i << "]" << update[i] << "\n";
-    }
+    //cout << "head:" << head << "\n";
+    //cout << "tail:" << tail << "\n";
+    // for(int i = 1;i <= max_level;++i)
+    // {
+    //     cout << "update[" << i << "]" << update[i] << "\n";
+    // }
     //接下来重建被隔断的索引
     for(int i = 1;i <= max_level;++i)
     {
